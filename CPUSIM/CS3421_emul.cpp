@@ -67,7 +67,19 @@ int main(int argc, char** argv) {
 		}
 		else if (!strcmp("memory set", command)) {
 			fscanf(inputFile, "%x", &hexValue);
-			//TODO: parse hex values that will need to be changed 
+			//TODO: parse hex values that will,  need to be changed 
+			char hexValues[2000];
+			fscanf(inputFile, "%[^\n]", hexValues); //get the rest of the hex values 
+			int size = 1;
+			unsigned int* hexArray = (unsigned int*) malloc(sizeof(unsigned int) * size);
+			unsigned int nextHex = 0x00;
+			printf(hexValues);
+			while( sscanf( hexValues, "%x", &nextHex ) != EOF ){
+				size++;
+				//printf("%x \n",nextHex);
+				hexArray = (unsigned int*) realloc(hexArray, sizeof(unsigned int)*size);
+				hexArray[size-1] = nextHex;
+			}
 			printf("memory set \n ");
 		}
 		else

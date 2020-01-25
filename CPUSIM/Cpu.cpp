@@ -14,7 +14,7 @@ void Cpu::reset()
 	RH = 0x00;
 }
 //set a register with a hex byte
-void Cpu::setReg(char secondRegisterLetter, int hexByte)
+void Cpu::setReg(char secondRegisterLetter, unsigned int hexByte)
 {
 	//special condition for PC
 	if (secondRegisterLetter == 'P') {

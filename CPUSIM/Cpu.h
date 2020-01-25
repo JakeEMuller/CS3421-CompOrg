@@ -8,7 +8,7 @@ public:
 	//resets all registers to 0x00
 	void reset();
 	//set a register with a hex byte
-    void setReg(char secondRegisterLetter , int hexByte);
+    void setReg(char secondRegisterLetter , unsigned int hexByte);
 	//dumps all values of registers too the console
 	void dump();
 

@@ -1,7 +1,7 @@
 #include "Memory.h"
 
 //create a number of memory addresses starting at 0x00
-void Memory::create(int hexSize)
+void Memory::create(unsigned int hexSize)
 {
 
 }
@@ -10,10 +10,10 @@ void Memory::reset()
 {
 }
 //dump values staring at memory address given 
-void Memory::dump(int hexAddress, int hexCount)
+void Memory::dump(unsigned int hexAddress, unsigned int hexCount)
 {
 }
 //starting from given hex address set values to given values
-void Memory::set(int hexAddress, int hexCount, int hexBytes[])
+void Memory::set(unsigned int hexAddress, int hexCount, unsigned int hexBytes[])
 {
 }
