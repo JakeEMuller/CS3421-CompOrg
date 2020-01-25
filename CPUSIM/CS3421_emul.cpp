@@ -74,6 +74,7 @@ int main(int argc, char** argv) {
 			unsigned int* hexArray = (unsigned int*) malloc(sizeof(unsigned int) * size);
 			unsigned int nextHex = 0x00;
 			printf(hexValues);
+			//TO-DO: GET sscanf to subtract values after reading them. 
 			while( sscanf( hexValues, "%x", &nextHex ) != EOF ){
 				size++;
 				//printf("%x \n",nextHex);
