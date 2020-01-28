@@ -32,62 +32,55 @@ int main(int argc, char** argv) {
 	while ( fscanf( inputFile, "%s %s" , command, secondCommand ) != EOF ) {
 		strcat(command, " "); // parse the two words
 		strcat(command, secondCommand); 
-		printf("%s: command \n ", command);
+		printf("%s: command \n", command);
 		//check clock functions
 		if (!strcmp("clock reset", command)) {
 			clock.reset();
-			printf("clock reset \n ");
+			printf("clock reset \n");
 		}
 		else if (!strcmp("clock tick", command)) {
 			fscanf(inputFile, "%x", &hexValue);
 			clock.tick(hexValue);
-			printf("clock tick \n ");
+			printf("clock tick \n");
 		}
 		else if (!strcmp("clock dump", command)) {
 			clock.dump();
-			printf("clock dump \n ");
+			printf("clock dump \n");
 		}
 		else
 		//check memory functions
 		if (!strcmp("memory create", command)) {
 			fscanf(inputFile, "%x", &hexValue); 
 			memory.create(hexValue);
-			printf("memory create \n ");
+			printf("memory create \n");
 		}
 		else if (!strcmp("memory reset", command)) {
 			memory.reset();
-			printf("memory reset \n ");
+			printf("memory reset \n");
 		}
 		else if (!strcmp("memory dump", command)) {
 			unsigned int* count = 0x00;
 			fscanf(inputFile ,"%x", &hexValue);
 			fscanf(inputFile, "%x", count);
 			memory.dump(hexValue, *count);
-			printf("memory dump \n ");
+			printf("memory dump \n");
 		}
 		else if (!strcmp("memory set", command)) {
 			fscanf(inputFile, "%x", &hexValue);
-			//TODO: parse hex values that will,  need to be changed 
-			char hexValues[2000];
-			fscanf(inputFile, "%[^\n]", hexValues); //get the rest of the hex values 
-			int size = 1;
-			unsigned int* hexArray = (unsigned int*) malloc(sizeof(unsigned int) * size);
-			unsigned int nextHex = 0x00;
-			printf(hexValues);
-			//TO-DO: GET sscanf to subtract values after reading them. 
-			while( sscanf( hexValues, "%x", &nextHex ) != EOF ){
-				size++;
-				//printf("%x \n",nextHex);
-				hexArray = (unsigned int*) realloc(hexArray, sizeof(unsigned int)*size);
-				hexArray[size-1] = nextHex;
+			unsigned int count = 0x00;
+			fscanf(inputFile, "%x", &count);
+			unsigned int byteArray[count];
+			for(unsigned int i = 0; i < count; i++){
+				fscanf(inputFile, "%x", &byteArray[i]);
+				printf( "%x ", byteArray[i]);
 			}
-			printf("memory set \n ");
+			printf("memory set \n");
 		}
 		else
 		//check cpu functions
 		if (!strcmp("cpu reset", command)) {
 			cpu.reset();
-			printf("cpu reset \n ");
+			printf("cpu reset \n");
 		}
 		else if (!strcmp("cpu set", command)) {
 			fscanf(inputFile, "%s", command);
@@ -103,12 +96,12 @@ int main(int argc, char** argv) {
 				fscanf(inputFile, "%x", &hexValue);
 				cpu.setReg(cpuReg[0], hexValue);
 			}
-			printf("cpu set \n ");
+			printf("cpu set \n");
 			
 		}
 		else if (!strcmp("cpu dump", command)) {
 			cpu.dump();
-			printf("Cpu dump \n ");
+			printf("Cpu dump \n");
 		}
 	}
 
