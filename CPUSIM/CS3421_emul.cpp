@@ -13,12 +13,13 @@ int main(int argc, char** argv) {
 	char* fileName = argv[1];
 
 	//create the three devices
-	//cpu
-	Cpu cpu;
-	cpu.reset();
 	//memory
 	Memory memory;
 	//TODO: Assign memory of zero bytes to avoid issues
+	//cpu
+	Cpu cpu;
+	cpu.reset(&memory);
+	
 	//clock
 	Clock clock;
 	clock.reset(&memory, &cpu);
@@ -41,7 +42,7 @@ int main(int argc, char** argv) {
 			printf("clock reset \n");
 		}
 		else if (!strcmp("clock tick", command)) {
-			fscanf(inputFile, "%x", &hexValue);
+			fscanf(inputFile, "%d", &hexValue);
 			clock.tick(hexValue);
 			printf("clock tick \n");
 		}

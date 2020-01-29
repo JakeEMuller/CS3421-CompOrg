@@ -9,15 +9,15 @@ public:
 
 	void reset();
 	void reset(Memory* mem, Cpu* cp);
-	void tick(int numberOfTicks);
+	void tick(unsigned int numberOfTicks);
 	void startTick();
 	void doCycleWork();
-	void isMoreCycleWorkNeeded();
+	bool isMoreCycleWorkNeeded();
 	void dump();
 
 private:
 	unsigned short currentTick = 0;
-	Memory memory;
-	Cpu cpu;
+	Memory* memory;
+	Cpu* cpu;
 
 };

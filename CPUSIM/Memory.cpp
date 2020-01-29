@@ -1,10 +1,41 @@
 #include "Memory.h"
-
-
-void Memory::doTick(){
-
+void Memory::startTick(){
+    //workType for memory will be none at the begining 
+    workType = None;
 }
 
+void Memory::doTick(){
+    if(workType == MemFetch){
+        completeMemFetch();
+    }else{
+        workType = None;
+    }
+    
+}
+
+//is more work needed
+bool Memory::isMoreWorkNeeded(){
+    if(workType == None){
+		return false; 
+	}else{
+		return true;
+	}
+}
+//start memfetch cycle
+void Memory::startMemFetch(unsigned int address, unsigned char* cpuByte, bool* cpuWaiting){
+    workType = MemFetch;
+    cpuPCvalue = address; //save PC value
+    cpuByteReturn = cpuByte; //save location where byte will be stored
+    cpuWait = cpuWaiting;
+    *cpuWaiting = true; //make the cpu wait
+
+}
+//do Memory Fetch
+void Memory::completeMemFetch(){
+    *cpuByteReturn = memoryStored[cpuPCvalue]; //put value into cpu byte return
+    *cpuWait = false;
+    workType = None;
+}
 //create a number of memory addresses starting at 0x00
 void Memory::create(unsigned int hexSize)
 {

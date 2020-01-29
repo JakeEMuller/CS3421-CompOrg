@@ -1,10 +1,43 @@
 #include "Cpu.h"
 
-
+void Cpu::startTick(){
+	//for now new tick will always fetch memory on new tick
+	workType = fetchMem;
+}
 void Cpu::doTick(){
-
+	if(workType == fetchMem){ //wants memory so it sends a signal to memory
+		memory->startMemFetch(PC, &receivedByte, &waitingOnMem);
+		workType = cycleReg;
+	}else if(workType == cycleReg && !waitingOnMem) //only cycles if not waiting for mem
+	{
+		cycleResisters();
+		workType = None;	
+	}
 }
 
+// check if more work is needed
+bool Cpu::isMoreWorkNeeded(){
+	if(workType == None){
+		return false; 
+	}else{
+		return true;
+	}
+}
+//cycle regsiters
+void Cpu::cycleResisters(){
+	//cycle all registers down one
+	RH = RG;
+	RG = RF;
+	RF = RE;
+	RE = RD;
+	RD = RC;
+	RC = RB;
+	RB = RA;
+	//set new RA reg
+	RA = receivedByte;
+	PC++;
+	workType = None;
+}
 //resets all registers to 0x00
 void Cpu::reset()
 {
@@ -20,6 +53,11 @@ void Cpu::reset()
 	RG = 0x00;
 	RH = 0x00;
 }
+void Cpu::reset(Memory* m){
+	reset();
+	memory = m;
+}
+
 //set a register with a hex byte
 void Cpu::setReg(char secondRegisterLetter, unsigned char hexByte)
 {
