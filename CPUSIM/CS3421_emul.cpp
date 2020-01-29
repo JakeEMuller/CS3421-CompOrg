@@ -13,15 +13,16 @@ int main(int argc, char** argv) {
 	char* fileName = argv[1];
 
 	//create the three devices
-	//clock
-	Clock clock;
-	clock.reset();
 	//cpu
 	Cpu cpu;
 	cpu.reset();
 	//memory
 	Memory memory;
 	//TODO: Assign memory of zero bytes to avoid issues
+	//clock
+	Clock clock;
+	clock.reset(&memory, &cpu);
+	
 
 
 	FILE* inputFile = fopen(fileName, "r");
@@ -32,7 +33,8 @@ int main(int argc, char** argv) {
 	while ( fscanf( inputFile, "%s %s" , command, secondCommand ) != EOF ) {
 		strcat(command, " "); // parse the two words
 		strcat(command, secondCommand); 
-		printf("%s: command \n", command);
+		printf("%s: \n", command);
+		
 		//check clock functions
 		if (!strcmp("clock reset", command)) {
 			clock.reset();
@@ -59,21 +61,24 @@ int main(int argc, char** argv) {
 			printf("memory reset \n");
 		}
 		else if (!strcmp("memory dump", command)) {
-			unsigned int* count = 0x00;
+			unsigned int count = 0x00;
 			fscanf(inputFile ,"%x", &hexValue);
-			fscanf(inputFile, "%x", count);
-			memory.dump(hexValue, *count);
+			fscanf(inputFile, "%x", &count);
+			memory.dump(hexValue, count);
 			printf("memory dump \n");
 		}
 		else if (!strcmp("memory set", command)) {
 			fscanf(inputFile, "%x", &hexValue);
 			unsigned int count = 0x00;
 			fscanf(inputFile, "%x", &count);
-			unsigned int byteArray[count];
+			unsigned char byteArray[count];
+			unsigned int temp;
 			for(unsigned int i = 0; i < count; i++){
-				fscanf(inputFile, "%x", &byteArray[i]);
-				printf( "%x ", byteArray[i]);
+				fscanf(inputFile, "%x", &temp);
+				byteArray[i] = (unsigned char)temp;
+				//printf( "%x ", byteArray[i]);
 			}
+			memory.set(hexValue, count, byteArray);
 			printf("memory set \n");
 		}
 		else
@@ -104,6 +109,5 @@ int main(int argc, char** argv) {
 			printf("Cpu dump \n");
 		}
 	}
-
-
+	memory.kill(); //frees any allocated memory
 }

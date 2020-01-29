@@ -1,8 +1,15 @@
 #include "Cpu.h"
 
+
+void Cpu::doTick(){
+
+}
+
 //resets all registers to 0x00
 void Cpu::reset()
 {
+	waitingOnMem = false;
+	receivedByte = 0x00;
 	PC = 0x00;
 	RA = 0x00;
 	RB = 0x00;
@@ -14,7 +21,7 @@ void Cpu::reset()
 	RH = 0x00;
 }
 //set a register with a hex byte
-void Cpu::setReg(char secondRegisterLetter, unsigned int hexByte)
+void Cpu::setReg(char secondRegisterLetter, unsigned char hexByte)
 {
 	//special condition for PC
 	if (secondRegisterLetter == 'P') {

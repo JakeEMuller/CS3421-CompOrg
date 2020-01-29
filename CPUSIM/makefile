@@ -3,7 +3,7 @@ CFLAGS = -pedantic -Wall -Wextra -O1
 LDFLAGS = -lm 
 
 # standard "make" 
-default: clean Cpu.o Clock.o Memory.o Parser
+default: clean Memory.o Cpu.o Clock.o  Parser
 # makes Cpu
 Cpu.o: Cpu.cpp Cpu.h
 	g++ -pedantic -Wall -Wextra -O1 -c Cpu.cpp -o Cpu ${LDFLAGS}
