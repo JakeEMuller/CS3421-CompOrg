@@ -5,6 +5,7 @@ using namespace std;
 
 class Memory {
 public:
+	unsigned int memorySize; // in hex
 	int workType;
 	//work types for Memory
 	enum workType {None, MemFetch};
@@ -32,5 +33,5 @@ private:
 	unsigned char* cpuByteReturn;
 	unsigned int cpuPCvalue;
 	unsigned char* memoryStored;
-	unsigned int memorySize; // in hex
+	
 };

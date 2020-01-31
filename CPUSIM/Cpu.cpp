@@ -35,7 +35,11 @@ void Cpu::cycleResisters(){
 	RB = RA;
 	//set new RA reg
 	RA = receivedByte;
-	PC++;
+	if(PC >= memory->memorySize){
+		PC = 0;
+	}else {
+		PC++;
+	}
 	workType = None;
 }
 //resets all registers to 0x00

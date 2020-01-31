@@ -79,7 +79,7 @@ void Memory::dump(unsigned int hexAddress, unsigned int hexCount)
     printf("\n");
 }
 //starting from given hex address set values to given values
-void Memory::set(unsigned int hexAddress, unsigned int hexCount, unsigned char hexBytes[])
+void Memory::set(unsigned int hexAddress, unsigned int hexCount, unsigned char* hexBytes)
 {
     for(unsigned int i = 0; i < hexCount; i++ ){
         memoryStored[hexAddress + i] = hexBytes[i];
