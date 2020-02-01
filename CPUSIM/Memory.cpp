@@ -1,4 +1,5 @@
 #include "Memory.h"
+
 void Memory::startTick(){
     //workType for memory will be none at the begining 
     workType = None;
@@ -73,10 +74,10 @@ void Memory::dump(unsigned int hexAddress, unsigned int hexCount)
         if(i < hexAddress){ //untill the hexAddres wanted is found print spaces
             printf("   ");
         }else{
-            printf("%02x ", memoryStored[i]);
+            printf("%02X ", memoryStored[i]);
         }
     }
-    printf("\n");
+    printf("\n\n");
 }
 //starting from given hex address set values to given values
 void Memory::set(unsigned int hexAddress, unsigned int hexCount, unsigned char* hexBytes)

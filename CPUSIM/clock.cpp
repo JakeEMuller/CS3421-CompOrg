@@ -44,5 +44,5 @@ bool Clock::isMoreCycleWorkNeeded(){
 
 void Clock::dump()
 {
-	printf("Clock: %hu \n", currentTick);
+	printf("Clock: %hu \n\n", currentTick);
 }

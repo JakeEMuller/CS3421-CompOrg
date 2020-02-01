@@ -20,8 +20,8 @@ int main(int argc, char** argv) {
 
 	//create the three devices
 	//memory
-	Memory memory;
-	//TODO: Assign memory of zero bytes to avoid issues
+	Memory memory; //memory should be initalized on memory create command
+	
 	//cpu
 	Cpu cpu;
 	cpu.reset(&memory);
@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
 	char command[30]; //thirty characters should be enought for the numbers
 	char secondCommand[30];
 	unsigned int hexValue = 0x00;
-	char cpuReg = 'X';
+	unsigned char cpuReg = 'X';
 	while ( fscanf( inputFile, "%s %s" , command, secondCommand ) != EOF ) {
 		strcat(command, " "); // parse the two words
 		strcat(command, secondCommand); 
@@ -97,7 +97,7 @@ int main(int argc, char** argv) {
 			//printf("cpu reset \n");
 		}
 		else if (!strcmp("cpu set", command)) {
-			junk = fscanf(inputFile, "%s", command);
+			junk = fscanf(inputFile, "%s ", command);
 			junk = fscanf(inputFile, "%c", &cpuReg);
 			//special condition for PC 
 			if (cpuReg == 'P') {

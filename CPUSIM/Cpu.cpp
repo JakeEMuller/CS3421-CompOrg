@@ -98,13 +98,13 @@ void Cpu::setReg(char secondRegisterLetter, unsigned char hexByte)
 //dumps all values of registers too the console
 void Cpu::dump()
 {
-	printf("PC: 0x%02x \n", PC);
-	printf("RA: 0x%02x \n", RA);
-	printf("RB: 0x%02x \n", RB);
-	printf("RC: 0x%02x \n", RC);
-	printf("RD: 0x%02x \n", RD);
-	printf("RE: 0x%02x \n", RE);
-	printf("RF: 0x%02x \n", RF);
-	printf("RG: 0x%02x \n", RG);
-	printf("RH: 0x%02x \n", RH);
+	printf("PC: 0x%02X \n", PC);
+	printf("RA: 0x%02X \n", RA);
+	printf("RB: 0x%02X \n", RB);
+	printf("RC: 0x%02X \n", RC);
+	printf("RD: 0x%02X \n", RD);
+	printf("RE: 0x%02X \n", RE);
+	printf("RF: 0x%02X \n", RF);
+	printf("RG: 0x%02X \n", RG);
+	printf("RH: 0x%02X \n\n", RH);
 }

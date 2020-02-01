@@ -9,6 +9,7 @@ public:
 	int workType;
 	//work types for Memory
 	enum workType {None, MemFetch};
+	//start tick operations
 	void startTick();
 	// do tick work
 	void doTick();
