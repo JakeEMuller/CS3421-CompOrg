@@ -2,7 +2,7 @@
 
 using namespace std;
 
-class InstrucMem{
+class InstructMem{
 
     public:
 
@@ -17,4 +17,4 @@ class InstrucMem{
     unsigned int* instructionArray;
     unsigned int memorySize;
 
-}
+};

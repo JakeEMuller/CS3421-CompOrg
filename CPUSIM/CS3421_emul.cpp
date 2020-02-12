@@ -3,9 +3,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include "Cpu.h"
+#include "InstructMem.h"
 #include "Memory.h"
 #include "clock.h"
-#include "InstructMem.h"
+
 using namespace std;
 
 
@@ -24,7 +25,7 @@ int main(int argc, char** argv) {
 	Memory memory; //memory should be initalized on memory create command
 	
 	//instruction memory 
-	InstrucMem imemory;
+	InstructMem imemory;
 	//cpu
 	Cpu cpu;
 	cpu.reset(&memory);
@@ -133,7 +134,11 @@ int main(int argc, char** argv) {
 			junk = fscanf(inputFile, "%x", &count);
 			imemory.dump(hexValue, count);
 		} else if(!strcmp("imemory set", command)){
-
+			junk = fscanf(inputFile ,"%x", &hexValue);
+			junk = fscanf(inputFile , "%s", command);
+			char thing[100];
+			junk = fscanf(inputFile , "%100s", thing);
+			imemory.set(hexValue, thing);
 		}
 	}
 
