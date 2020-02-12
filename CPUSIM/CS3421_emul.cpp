@@ -5,6 +5,7 @@
 #include "Cpu.h"
 #include "Memory.h"
 #include "clock.h"
+#include "InstructMem.h"
 using namespace std;
 
 
@@ -22,6 +23,8 @@ int main(int argc, char** argv) {
 	//memory
 	Memory memory; //memory should be initalized on memory create command
 	
+	//instruction memory 
+	InstrucMem imemory;
 	//cpu
 	Cpu cpu;
 	cpu.reset(&memory);
@@ -116,6 +119,21 @@ int main(int argc, char** argv) {
 		else if (!strcmp("cpu dump", command)) {
 			cpu.dump();
 			//printf("Cpu dump \n");
+		}else
+		//instruction Memory commands
+		if(!strcmp("imemory create", command)){
+			junk = fscanf(inputFile, "%x", &hexValue); 
+			imemory.create(hexValue);
+
+		} else if(!strcmp("imemory reset", command)){
+			imemory.reset();
+		} else if(!strcmp("imemory dump", command)){
+			unsigned int count = 0x00;
+			junk = fscanf(inputFile ,"%x", &hexValue);
+			junk = fscanf(inputFile, "%x", &count);
+			imemory.dump(hexValue, count);
+		} else if(!strcmp("imemory set", command)){
+
 		}
 	}
 
