@@ -2,21 +2,22 @@
 #include <iostream>
 #include "Cpu.h"
 #include "Memory.h"
+#include "InstructMem.h"
 using namespace std;
 
 class Clock {
 public:
 
 	void reset();
-	void reset(Memory* mem, Cpu* cp);
+	void reset(Memory* mem, Cpu* cp, InstructMem* imem);
 	void tick(unsigned int numberOfTicks);
 	void startTick();
-	void doCycleWork();
 	bool isMoreCycleWorkNeeded();
 	void dump();
 
 private:
 	unsigned short currentTick = 0;
+	InstructMem* imemory;
 	Memory* memory;
 	Cpu* cpu;
 

@@ -7,18 +7,16 @@ class Memory {
 public:
 	unsigned int memorySize; // in hex
 	int workType;
+	//basic setup
+	void setup();
 	//work types for Memory
-	enum workType {None, MemFetch};
+	enum workType {None, MemFetch, setMem};
 	//start tick operations
 	void startTick();
 	// do tick work
 	void doTick();
 	//is more work needed
 	bool isMoreWorkNeeded();
-	//start memfetch
-	void startMemFetch(unsigned int address, unsigned char* cpuByte, bool* cpuWaiting);
-	//complete Mem Fetch
-	void completeMemFetch();
 	//create a number of memory addresses starting at 0x00
 	void create(unsigned int hexSize);
 	//sets all memory to 0x00
@@ -29,10 +27,21 @@ public:
 	void dump(unsigned int hexAddress, unsigned int hexCount);
 	//starting from given hex address set values to given values
 	void set( unsigned int hexAddress, unsigned int hexCount, unsigned char hexBytes[] ); 
+
+	//load memory function
+	void startMemFetch(unsigned int address, unsigned char* cpuByte, bool* cpuWaiting);
+	void completeMemFetch();
+
+	//store memory function
+	void startMemStore(unsigned int address, unsigned char StoredByte, bool* cpuWaiting);
+	void completeMemStore();
 private:
+	unsigned int memSpeed = 5;
+	unsigned int speedCount;
 	bool* cpuWait;
 	unsigned char* cpuByteReturn;
 	unsigned int cpuPCvalue;
 	unsigned char* memoryStored;
+	unsigned char* inputValue;
 	
 };

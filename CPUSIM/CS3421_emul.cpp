@@ -28,11 +28,11 @@ int main(int argc, char** argv) {
 	InstructMem imemory;
 	//cpu
 	Cpu cpu;
-	cpu.reset(&memory);
+	cpu.reset(&memory, &imemory);
 	
 	//clock
 	Clock clock;
-	clock.reset(&memory, &cpu);
+	clock.reset(&memory, &cpu, &imemory);
 	
 
 

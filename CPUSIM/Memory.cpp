@@ -1,42 +1,5 @@
 #include "Memory.h"
 
-void Memory::startTick(){
-    //workType for memory will be none at the begining 
-    workType = None;
-}
-
-void Memory::doTick(){
-    if(workType == MemFetch){
-        completeMemFetch();
-    }else{
-        workType = None;
-    }
-    
-}
-
-//is more work needed
-bool Memory::isMoreWorkNeeded(){
-    if(workType == None){
-		return false; 
-	}else{
-		return true;
-	}
-}
-//start memfetch cycle
-void Memory::startMemFetch(unsigned int address, unsigned char* cpuByte, bool* cpuWaiting){
-    workType = MemFetch;
-    cpuPCvalue = address; //save PC value
-    cpuByteReturn = cpuByte; //save location where byte will be stored
-    cpuWait = cpuWaiting;
-    *cpuWaiting = true; //make the cpu wait
-
-}
-//do Memory Fetch
-void Memory::completeMemFetch(){
-    *cpuByteReturn = memoryStored[cpuPCvalue]; //put value into cpu byte return
-    *cpuWait = false;
-    workType = None;
-}
 //create a number of memory addresses starting at 0x00
 void Memory::create(unsigned int hexSize)
 {
@@ -84,5 +47,68 @@ void Memory::set(unsigned int hexAddress, unsigned int hexCount, unsigned char* 
 {
     for(unsigned int i = 0; i < hexCount; i++ ){
         memoryStored[hexAddress + i] = hexBytes[i];
+    }
+}
+
+void Memory::setup(){
+    speedCount = 0;
+    workType = None;
+}
+
+void Memory::startTick(){
+    
+}
+
+void Memory::doTick(){
+    if(workType == MemFetch){
+        completeMemFetch();
+    }
+}
+
+//is more work needed
+bool Memory::isMoreWorkNeeded(){
+    return false;
+}
+//*******************************
+// memfetch cycle methods
+//*******************************
+void Memory::startMemFetch(unsigned int address, unsigned char* cpuByte, bool* cpuWaiting){
+    workType = MemFetch;
+    cpuPCvalue = address; //save PC value
+    cpuByteReturn = cpuByte; //save location where byte will be stored
+    cpuWait = cpuWaiting;
+    *cpuWaiting = true; //make the cpu wait
+
+}
+//do Memory Fetch
+void Memory::completeMemFetch(){
+    if(speedCount <= 5){ //make sure 
+        speedCount++;
+    } else {
+        *cpuByteReturn = memoryStored[cpuPCvalue]; //put value into cpu byte return
+        *cpuWait = false;
+        workType = None;
+        speedCount = 0;
+    }
+    
+}
+
+//**************************
+// store memory methods
+//**************************
+
+void Memory::startMemStore(unsigned int address, unsigned char StoredByte, bool* cpuWaiting){
+    workType = setMem;
+    cpuPCvalue = address;
+    cpuByteReturn = &StoredByte;
+    cpuWait = cpuWaiting;
+    *cpuWaiting = true;
+}
+
+void Memory::completeMemStore(){
+    if(speedCount <= 5){ //make sure 
+        speedCount++;
+    } else {
+        
     }
 }

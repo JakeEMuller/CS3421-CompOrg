@@ -1,5 +1,9 @@
 #include "InstructMem.h"
 
+void InstructMem::setup(){
+    workType = None;
+}
+
 void InstructMem::create(unsigned int hexBytes){
     memorySize = hexBytes;
     instructionArray = (unsigned int*) malloc(hexBytes * sizeof(unsigned int));
@@ -36,16 +40,45 @@ void InstructMem::set(unsigned int hexAdr, char* fileDir){
     FILE* file = fopen(fileDir, "r");
     unsigned int temp = 0;
     unsigned int i = 0;
-    //for(int i = 0; i < hexAdr; i++ ){
-    //    if(fscanf(file, "%X", &temp) == EOF || (i + hexAdr) >= memorySize){
-    //        break;
-    //    }
-    //    temp = 0xfffff & temp; //make into 20 bit for my sanity
-    //    instructionArray[hexAdr + i] = temp;
-    //}
     while(fscanf(file, "%X", &temp) != EOF && (i + hexAdr) != memorySize){
         temp = 0xfffff & temp; //make into 20 bit for my sanity
         instructionArray[hexAdr + i] = temp;
         i++;
     }
 }
+
+//begin clock methods
+void InstructMem::startTick(){
+    
+}
+
+void InstructMem::doTick(){
+    if(workType == returnInsturct){
+        completeInstructFetch();
+    }
+}
+
+bool InstructMem::isMoreWorkNeeded(){
+    return false;
+}
+
+
+//******************************************
+// return Insctrction methods
+//******************************************
+
+void InstructMem::startInstructFetch(unsigned int address, unsigned int* cpuInstruct, bool* cpuWaiting){
+    workType = returnInsturct;
+    cpuPCvalue = address;
+    cpuByteReturn = cpuInstruct;
+    cpuWait  = cpuWaiting;
+    *cpuWaiting = true;
+}
+
+void InstructMem::completeInstructFetch(){
+    *cpuByteReturn = instructionArray[cpuPCvalue];
+    *cpuWait = false;
+    workType = None;
+}
+
+

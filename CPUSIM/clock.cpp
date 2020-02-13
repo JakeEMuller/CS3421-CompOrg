@@ -7,10 +7,11 @@ void Clock::reset()
 	//cout << "clock reset";
 }
 //resets the clock but set mem and cpu
-void Clock::reset(Memory* mem, Cpu* cp){
+void Clock::reset(Memory* mem, Cpu* cp, InstructMem* imem){
 	currentTick = 0;
 	memory = mem; //sets mem
 	cpu = cp; //sets cpu
+	imemory = imem;
 }
 
 
@@ -20,8 +21,10 @@ void Clock::tick(unsigned int numberOfTicks)
 		startTick();
 		bool workToDo = true;
 		while(workToDo){
-			memory->doTick();
+			
 			cpu->doTick();
+			imemory->doTick();
+			memory->doTick();
 			workToDo = isMoreCycleWorkNeeded();
 		}
 		currentTick++;
@@ -31,15 +34,11 @@ void Clock::tick(unsigned int numberOfTicks)
 void Clock::startTick(){
 	memory->startTick();
 	cpu->startTick();
-}
-
-void Clock::doCycleWork(){
-	memory->doTick();
-	cpu->doTick();
+	imemory->startTick();
 }
 
 bool Clock::isMoreCycleWorkNeeded(){
-	return (memory->isMoreWorkNeeded() || cpu->isMoreWorkNeeded());
+	return (memory->isMoreWorkNeeded() || cpu->isMoreWorkNeeded() || imemory->isMoreWorkNeeded());
 }
 
 void Clock::dump()
