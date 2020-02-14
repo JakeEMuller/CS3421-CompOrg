@@ -5,13 +5,15 @@ void Cpu::reset()
 {
 	waitingOnMem = false;
 	free(regs);
-	regs = (unsigned char*) calloc(9, sizeof(unsigned char));
+	regs = (unsigned char*) calloc(9, sizeof(unsigned char)); //set all registers to zero
 	receivedByte = 0x00;
+	workType = None;
+	memory->setup(); //reset memory in case memory is doing somthing for cpu
 }
 void Cpu::reset(Memory* m, InstructMem* i){
 	waitingOnMem = false;
 	receivedByte = 0x00;
-	regs = (unsigned char*) malloc(9);
+	regs = (unsigned char*) calloc(9, sizeof(unsigned char));
 	memory = m;
 	imemory = i;
 	workType = None;
@@ -28,7 +30,9 @@ void Cpu::setReg(char secondRegisterLetter, unsigned char hexByte)
 {
 	//special condition for PC
 	if (secondRegisterLetter == 'P') {
-		regs[0] = hexByte;
+		regs[0] = hexByte; //TEST TO MAKE SURE EVERTHING WITH THIS WORKS
+		workType = None;
+		memory->setup(); //reset memory to cancel instruction
 	}
 	else if (secondRegisterLetter == 'A') {
 		regs[1] = hexByte;
@@ -83,45 +87,28 @@ void Cpu::startTick(){
 bool Cpu::isMoreWorkNeeded(){
 	if(workType == None){
 		return false; 
-	}else if(waitingOnMem){
+	}else if(waitingOnMem){ //if waiting on memory cpu cant do anything
 		return false;
 	} else {
 		return true;
 	}
 }
 
+//increment program counter
 void Cpu::incPC(){
-	if(regs[0] >= imemory->memorySize){
-		regs[0] = 0;
-		printf("really big");
-		exit(0);
-	}else {
+	//printf("mem size: %X", imemory->memorySize);
+	if(regs[0] < imemory->memorySize -1){
 		regs[0]++;
+	}else {
+		regs[0] = 0;
 	}
 	
 }
 
 void Cpu::doTick(){
-	//************************
-	// legacy features
-	//************************
-	if(workType == fetchMem){ //wants memory so it sends a signal to memory
-		memory->startMemFetch(regs[0], &receivedByte, &waitingOnMem);
-		workType = cycleReg;
-	}else if(workType == cycleReg && !waitingOnMem) //only cycles if not waiting for mem
-	{
-		//cycleResisters();
-		workType = None;	
-
-	
-	}
-	//***************************************
-	//ticks for finding the instrcution
-	//***************************************
-	else if(workType == findInstruct){ //start to find next instruciton
+	if(workType == findInstruct){ //start to find next instruciton
 		imemory->startInstructFetch(regs[0], &instruction, &waitingOnMem);
 		workType = doInstruct;
-		incPC();
 	} else if(workType == doInstruct && !waitingOnMem){ //read function
 		doInstruction();
 	} 
@@ -130,12 +117,14 @@ void Cpu::doTick(){
 		unsigned int regNum = (instruction >> 14) & 0x7; //get address to store in
 		regs[regNum + 1] = receivedByte;
 		workType = None; 
+		incPC();
 	}
 	//ticks for sw
 	else if(workType == finMemSw && !waitingOnMem){
 		workType = None; //finish instruction so new instruction is started yet  
+		incPC();
 	}
-	printf("Work done: %d \n", workType);
+	//printf("Work done: %d \n", workType);
 }
 
 
@@ -144,42 +133,25 @@ void Cpu::doTick(){
 //******************************
 void Cpu::doInstruction(){
 	unsigned int type = instruction >> 17;
-	printf("type: %d \n", type);
+	//printf("type: %d \n", type);
 	//set Worktype
 	if(type == 5){ //load word
 		unsigned int add = (instruction >> 8) & 0x7; //find memory address to get
-		printf("lw address: %d \n", add);
+		//printf("lw address: %d \n", add);
 		memory->startMemFetch(regs[add+1], &receivedByte, &waitingOnMem);
 		workType = storeInReg;
 
 	}else if(type == 6){ //store word
 		unsigned int add = (instruction >> 8) & 0x7; //find address to store in
-		printf("sw address: %d \n", add);
-		unsigned int value = regs[((instruction >> 8) & 0x7) + 1];
-		memory->startMemStore(add, value, &waitingOnMem);
+		//printf("sw address: %d \n", add);
+		unsigned int value = regs[((instruction >> 11) & 0x7) + 1];
+		//printf("value: %X", value);
+		memory->startMemStore(regs[add+1], value, &waitingOnMem);
 		workType = finMemSw;
+	} else {
+		workType = None;
+		printf("No work: %X \n", type);
 	}
+	
 }
 
-
-//******************************
-//cycle regsiters *legacy*
-//******************************
-//void Cpu::cycleResisters(){
-//	//cycle all registers down one
-//	RH = RG;
-//	RG = RF;
-//	RF = RE;
-//	RE = RD;
-//	RD = RC;
-//	RC = RB;
-//	RB = RA;
-//	//set new RA reg
-//	RA = receivedByte;
-//	if(PC >= memory->memorySize){
-//		PC = 0;
-//	}else {
-//		PC++;
-//	}
-//	workType = None;
-//}

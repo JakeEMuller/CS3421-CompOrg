@@ -6,7 +6,7 @@ using namespace std;
 
 class Cpu {
 public:
-	enum workType {None, fetchMem, cycleReg, findInstruct, readInstruct, doInstruct, storeInReg, finMemSw};
+	enum workType {None, findInstruct, readInstruct, doInstruct, storeInReg, finMemSw};
 	//start new tick
 	void startTick();
 	//do tick work

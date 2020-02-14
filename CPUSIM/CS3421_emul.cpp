@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
 	while ( fscanf( inputFile, "%s %s" , command, secondCommand ) != EOF ) {
 		strcat(command, " "); // parse the two words
 		strcat(command, secondCommand); 
-		//printf("%s: \n", command);
+		//printf("command: %s \n", command);
 		
 		//check clock functions
 		if (!strcmp("clock reset", command)) {
