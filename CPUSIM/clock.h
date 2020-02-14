@@ -2,7 +2,6 @@
 #include <iostream>
 #include "Cpu.h"
 #include "Memory.h"
-#include "InstructMem.h"
 using namespace std;
 
 class Clock {

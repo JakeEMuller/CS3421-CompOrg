@@ -9,10 +9,13 @@ void Cpu::reset()
 	receivedByte = 0x00;
 }
 void Cpu::reset(Memory* m, InstructMem* i){
-	reset();
+	waitingOnMem = false;
+	receivedByte = 0x00;
 	regs = (unsigned char*) malloc(9);
 	memory = m;
 	imemory = i;
+	workType = None;
+
 }
 
 void Cpu::kill(){
@@ -87,6 +90,17 @@ bool Cpu::isMoreWorkNeeded(){
 	}
 }
 
+void Cpu::incPC(){
+	if(regs[0] >= imemory->memorySize){
+		regs[0] = 0;
+		printf("really big");
+		exit(0);
+	}else {
+		regs[0]++;
+	}
+	
+}
+
 void Cpu::doTick(){
 	//************************
 	// legacy features
@@ -96,7 +110,7 @@ void Cpu::doTick(){
 		workType = cycleReg;
 	}else if(workType == cycleReg && !waitingOnMem) //only cycles if not waiting for mem
 	{
-		cycleResisters();
+		//cycleResisters();
 		workType = None;	
 
 	
@@ -104,18 +118,24 @@ void Cpu::doTick(){
 	//***************************************
 	//ticks for finding the instrcution
 	//***************************************
-	else if(workType = findInstruct){ //start to find next instruciton
+	else if(workType == findInstruct){ //start to find next instruciton
 		imemory->startInstructFetch(regs[0], &instruction, &waitingOnMem);
 		workType = doInstruct;
+		incPC();
 	} else if(workType == doInstruct && !waitingOnMem){ //read function
 		doInstruction();
 	} 
 	//ticks for lw
-	else if(workType = storeInReg && !waitingOnMem){
+	else if(workType == storeInReg && !waitingOnMem){
 		unsigned int regNum = (instruction >> 14) & 0x7; //get address to store in
 		regs[regNum + 1] = receivedByte;
 		workType = None; 
 	}
+	//ticks for sw
+	else if(workType == finMemSw && !waitingOnMem){
+		workType = None; //finish instruction so new instruction is started yet  
+	}
+	printf("Work done: %d \n", workType);
 }
 
 
@@ -124,14 +144,20 @@ void Cpu::doTick(){
 //******************************
 void Cpu::doInstruction(){
 	unsigned int type = instruction >> 17;
+	printf("type: %d \n", type);
 	//set Worktype
-	if(type == 0b101){ //load word
+	if(type == 5){ //load word
 		unsigned int add = (instruction >> 8) & 0x7; //find memory address to get
-		memory->startMemFetch(add, &receivedByte, &waitingOnMem);
+		printf("lw address: %d \n", add);
+		memory->startMemFetch(regs[add+1], &receivedByte, &waitingOnMem);
 		workType = storeInReg;
 
-	}else if(type = 0b110){
-		
+	}else if(type == 6){ //store word
+		unsigned int add = (instruction >> 8) & 0x7; //find address to store in
+		printf("sw address: %d \n", add);
+		unsigned int value = regs[((instruction >> 8) & 0x7) + 1];
+		memory->startMemStore(add, value, &waitingOnMem);
+		workType = finMemSw;
 	}
 }
 

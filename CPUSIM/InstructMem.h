@@ -5,10 +5,12 @@ using namespace std;
 class InstructMem{
 
     public:
+    unsigned int memorySize;
     enum workType {None, returnInsturct};
     void create(unsigned int hexBytes);
     void setup();
     void reset();
+    void kill();
     void dump(unsigned int hexAdr, unsigned int count);
     void set(unsigned int hexAdr, char* fileDir);
     void startTick();
@@ -22,7 +24,7 @@ class InstructMem{
     private:
     int workType;
     unsigned int* instructionArray;
-    unsigned int memorySize;
+    
     //cpu values
     bool* cpuWait;
 	unsigned int* cpuByteReturn;

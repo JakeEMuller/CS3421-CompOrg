@@ -6,13 +6,15 @@ using namespace std;
 
 class Cpu {
 public:
-	enum workType {None, fetchMem, cycleReg, findInstruct, readInstruct, doInstruct, storeInReg};
+	enum workType {None, fetchMem, cycleReg, findInstruct, readInstruct, doInstruct, storeInReg, finMemSw};
 	//start new tick
 	void startTick();
 	//do tick work
 	void doTick();
 	//is more work needed
 	bool isMoreWorkNeeded();
+	//increment PC
+	void incPC();
 	//cycle registers
 	void cycleResisters();
 	//resets all registers to 0x00

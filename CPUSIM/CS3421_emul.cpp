@@ -3,7 +3,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include "Cpu.h"
-#include "InstructMem.h"
 #include "Memory.h"
 #include "clock.h"
 
@@ -23,9 +22,10 @@ int main(int argc, char** argv) {
 	//create the three devices
 	//memory
 	Memory memory; //memory should be initalized on memory create command
-	
+	memory.setup();
 	//instruction memory 
 	InstructMem imemory;
+	imemory.setup();
 	//cpu
 	Cpu cpu;
 	cpu.reset(&memory, &imemory);
@@ -93,6 +93,7 @@ int main(int argc, char** argv) {
 			}
 			memory.set(hexValue, count, byteArray);
 			//printf("memory set \n");
+			free(byteArray);
 		}
 		else
 		//check cpu functions
@@ -146,4 +147,6 @@ int main(int argc, char** argv) {
 		exit(1);
 	}
 	memory.kill(); //frees any allocated memory
+	cpu.kill();
+	imemory.kill();
 }

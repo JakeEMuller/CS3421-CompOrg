@@ -62,6 +62,8 @@ void Memory::startTick(){
 void Memory::doTick(){
     if(workType == MemFetch){
         completeMemFetch();
+    }else if(workType == setMem){
+        completeMemStore();
     }
 }
 
@@ -78,6 +80,7 @@ void Memory::startMemFetch(unsigned int address, unsigned char* cpuByte, bool* c
     cpuByteReturn = cpuByte; //save location where byte will be stored
     cpuWait = cpuWaiting;
     *cpuWaiting = true; //make the cpu wait
+    printf("start mem, address: %4X \n", address);
 
 }
 //do Memory Fetch
@@ -88,6 +91,7 @@ void Memory::completeMemFetch(){
         *cpuByteReturn = memoryStored[cpuPCvalue]; //put value into cpu byte return
         *cpuWait = false;
         workType = None;
+        printf("completeMemFetch, Byte Return: %X", *cpuByteReturn);
         speedCount = 0;
     }
     
@@ -100,7 +104,7 @@ void Memory::completeMemFetch(){
 void Memory::startMemStore(unsigned int address, unsigned char StoredByte, bool* cpuWaiting){
     workType = setMem;
     cpuPCvalue = address;
-    cpuByteReturn = &StoredByte;
+    cpuByteReturn = &StoredByte; //reuse memory fetch varables 
     cpuWait = cpuWaiting;
     *cpuWaiting = true;
 }
@@ -109,6 +113,9 @@ void Memory::completeMemStore(){
     if(speedCount <= 5){ //make sure 
         speedCount++;
     } else {
-        
+        memoryStored[cpuPCvalue] = *cpuByteReturn; 
+        *cpuWait = false;
+        workType = None;
+        speedCount = 0;
     }
 }

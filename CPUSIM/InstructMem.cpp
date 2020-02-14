@@ -14,6 +14,10 @@ void InstructMem::reset(){
     instructionArray = (unsigned int*) calloc(memorySize, sizeof(unsigned int));
 }
 
+void InstructMem::kill(){
+    free(instructionArray);
+}
+
 void InstructMem::dump(unsigned int hexAdr, unsigned int count){
     printf("Addr     0     1     2     3     4     5     6");
     int label = 0;
