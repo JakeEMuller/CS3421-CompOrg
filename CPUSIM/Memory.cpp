@@ -103,18 +103,25 @@ void Memory::completeMemFetch(){
 //**************************
 
 void Memory::startMemStore(unsigned int address, unsigned char StoredByte, bool* cpuWaiting){
+    
     workType = setMem;
-    cpuPCvalue = address;
+    printf("startMemStore, Address: %X, StoredByte: %X, cpuWaiting: %X  \n", address, StoredByte, cpuWaiting);
+    cpuPCvalue = address; //at 
+    printf("here, cpuByteReturn: %X \n", cpuByteReturn);
     *cpuByteReturn = StoredByte; //reuse memory fetch varables 
+    printf("no here \n");
     cpuWait = cpuWaiting;
     *cpuWaiting = true;
+    
     //printf("start mem store, address: %4X, byte: %2X  \n", cpuPCvalue, *cpuByteReturn);
 }
 
 void Memory::completeMemStore(){
     if(speedCount < memSpeed - 1){ //make sure 
+        printf("wait on mem: %d", speedCount);
         speedCount++;
     } else {
+        printf("completeMemStore");
         memoryStored[cpuPCvalue] = *cpuByteReturn; 
         //printf("memory stored: %2X \n", *cpuByteReturn);
         *cpuWait = false;

@@ -128,6 +128,7 @@ void Cpu::doTick(){
 	else if(workType == finMemSw && !waitingOnMem){
 		workType = None; //finish instruction so new instruction is started yet  
 		incPC();
+	//wait on cpu
 	} else if(workType == WaitOnCPU){
 		cyclesNeeded--;
 		if(cyclesNeeded <= 0){
@@ -147,9 +148,9 @@ void Cpu::doTick(){
 //******************************
 void Cpu::doInstruction(){
 	unsigned int type = instruction >> 17;
-	unsigned int destination = ((instruction >> 14) & 0x7) + 1;
-	unsigned int source = ((instruction >> 11) & 0x7) + 1;
-	unsigned int target = ((instruction >> 8) & 0x7) + 1;
+	unsigned int destination = ((instruction >> 14) & 0x7) + 1; //desitantion of destination
+	unsigned int source = ((instruction >> 11) & 0x7) + 1; //desitantion of source
+	unsigned int target = ((instruction >> 8) & 0x7) + 1; //desitantion of target
 	unsigned int immediate = instruction & 0xFF;
 	//printf("type: %d \n", type);
 	//set Worktype
@@ -160,9 +161,9 @@ void Cpu::doInstruction(){
 		workType = storeInReg;
 
 	}else if(type == 6){ //store word
-		unsigned int add = (instruction >> 8) & 0x7; //find address to store in
-		unsigned int value = regs[((instruction >> 11) & 0x7) + 1];
-		memory->startMemStore(regs[add+1], value, &waitingOnMem);
+		printf("store word \n");
+		unsigned int value = regs[source];
+		memory->startMemStore(regs[target], value, &waitingOnMem);
 		workType = finMemSw;
 	} else if(type == 0){ //add two complement numbers
 		// add registers 
@@ -191,9 +192,9 @@ void Cpu::doInstruction(){
 		regs[destination] = ~(regs[source]);
 		incPC();
 		workType = None;
-	}else if((type == 4) && (destination == 0)){  //if s and t are equal inc PC if not set pc to imediate 
-		printf("beq \n");
-		if(regs[source] != regs[target]){
+	}else if((type == 4) && ( (destination-1) == 0)){  //if s and t are equal inc PC if not set pc to imediate 
+		printf("beq, PC:%X \n" , regs[0]);
+		if(regs[source] == regs[target]){
 			regs[0] = immediate;
 			cyclesNeeded = 1;
 			workType = WaitOnCPU; //wait on CPU
@@ -202,13 +203,24 @@ void Cpu::doInstruction(){
 			workType = None;
 		}
 
-	}else if(type == 4 && (destination == 1)){ // is s is less than t then PC = immediate otherwise increment and two cycles
+	}else if(type == 4 && ((destination-1) == 1)){ // is s is less than t then PC = immediate otherwise increment and two cycles
 		printf("bneq \n");
+		if(regs[source] != regs[target]){
+			regs[0] = immediate;
+			cyclesNeeded = 1;
+			workType = WaitOnCPU;
+			
+		}else {
+			workType = None;
+			incPC();
+			
+		}
+	}else if(type == 4 && ( (destination-1) == 2)){
 		if(regs[source] < regs[target]){
 			regs[0] = immediate;
 			cyclesNeeded = 1;
 			workType = WaitOnCPU;
-		}else {
+		}else{
 			incPC();
 			workType = None;
 		}
