@@ -6,7 +6,7 @@ using namespace std;
 
 class Cpu {
 public:
-	enum workType {None, findInstruct, readInstruct, doInstruct, storeInReg, finMemSw};
+	enum workType {None, findInstruct, readInstruct, doInstruct, storeInReg, finMemSw, WaitOnCPU, HALT};
 	//start new tick
 	void startTick();
 	//do tick work
@@ -44,6 +44,7 @@ private:
 	unsigned int instruction;
 	unsigned char receivedByte; //byte to receive from memory
 	unsigned char* regs;
+	unsigned int cyclesNeeded;
 	//unsigned char PC, RA, RB, RC, RD, RE, RF, RG, RH;
 	
 

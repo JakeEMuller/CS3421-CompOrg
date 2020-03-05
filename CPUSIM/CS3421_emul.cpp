@@ -12,7 +12,11 @@ using namespace std;
 
 int main(int argc, char** argv) {
 
+	
 	if(argc <= 1){
+		unsigned char yeet = 0xFF;
+		unsigned char yoot = ~yeet;
+		printf("%X, %X \n", yeet, yoot);
 		return 0;
 	}
 

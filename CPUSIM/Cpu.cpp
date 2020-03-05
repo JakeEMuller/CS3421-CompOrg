@@ -13,6 +13,7 @@ void Cpu::reset()
 void Cpu::reset(Memory* m, InstructMem* i){
 	waitingOnMem = false;
 	receivedByte = 0x00;
+	cyclesNeeded = 0;
 	regs = (unsigned char*) calloc(9, sizeof(unsigned char));
 	memory = m;
 	imemory = i;
@@ -89,6 +90,10 @@ bool Cpu::isMoreWorkNeeded(){
 		return false; 
 	}else if(waitingOnMem){ //if waiting on memory cpu cant do anything
 		return false;
+	}else if(cyclesNeeded > 0){
+		return false;
+	}else if(workType == HALT){
+		return false;
 	} else {
 		return true;
 	}
@@ -123,8 +128,17 @@ void Cpu::doTick(){
 	else if(workType == finMemSw && !waitingOnMem){
 		workType = None; //finish instruction so new instruction is started yet  
 		incPC();
+	} else if(workType == WaitOnCPU){
+		cyclesNeeded--;
+		if(cyclesNeeded <= 0){
+			workType = None;
+		}else {
+			workType = WaitOnCPU;
+		}
+	//halt 
+	}else if(workType == HALT){
+		workType = HALT;
 	}
-	//printf("Work done: %d \n", workType);
 }
 
 
@@ -133,6 +147,10 @@ void Cpu::doTick(){
 //******************************
 void Cpu::doInstruction(){
 	unsigned int type = instruction >> 17;
+	unsigned int destination = ((instruction >> 14) & 0x7) + 1;
+	unsigned int source = ((instruction >> 11) & 0x7) + 1;
+	unsigned int target = ((instruction >> 8) & 0x7) + 1;
+	unsigned int immediate = instruction & 0xFF;
 	//printf("type: %d \n", type);
 	//set Worktype
 	if(type == 5){ //load word
@@ -143,14 +161,63 @@ void Cpu::doInstruction(){
 
 	}else if(type == 6){ //store word
 		unsigned int add = (instruction >> 8) & 0x7; //find address to store in
-		//printf("sw address: %d \n", add);
 		unsigned int value = regs[((instruction >> 11) & 0x7) + 1];
-		//printf("value: %X", value);
 		memory->startMemStore(regs[add+1], value, &waitingOnMem);
 		workType = finMemSw;
-	} else {
+	} else if(type == 0){ //add two complement numbers
+		// add registers 
+		char s = regs[source];
+		char t = regs[target];
+		regs[destination] = (s + t); //add and convert back to 3 bits 
+		incPC(); //increment PC
 		workType = None;
-		printf("No work: %X \n", type);
+
+	} else if(type == 1){ //add from source register and imdiate into destination 
+		char s = regs[source];
+		regs[destination] = (s + immediate); //add and convert back to 3 bits 
+		incPC(); //increment PC
+		workType = None;
+
+	} else if(type == 2){ //multiply top four bit by bottom four bits 
+		char full =  regs[source];
+		char left = (full >> 4) & 0xF;
+		char right = full & 0xF;
+		char mult = left * right;
+		regs[destination] = mult;
+		incPC();
+		cyclesNeeded = 1; //needs one more cycle 
+		workType = WaitOnCPU;
+	}else if(type == 3){ //invert all bits 
+		regs[destination] = ~(regs[source]);
+		incPC();
+		workType = None;
+	}else if((type == 4) && (destination == 0)){  //if s and t are equal inc PC if not set pc to imediate 
+		printf("beq \n");
+		if(regs[source] != regs[target]){
+			regs[0] = immediate;
+			cyclesNeeded = 1;
+			workType = WaitOnCPU; //wait on CPU
+		}else{
+			incPC();
+			workType = None;
+		}
+
+	}else if(type == 4 && (destination == 1)){ // is s is less than t then PC = immediate otherwise increment and two cycles
+		printf("bneq \n");
+		if(regs[source] < regs[target]){
+			regs[0] = immediate;
+			cyclesNeeded = 1;
+			workType = WaitOnCPU;
+		}else {
+			incPC();
+			workType = None;
+		}
+	}else if(type == 7){ //halt (inc PC then kill CPU)
+		workType = HALT;
+		incPC();
+	}else {
+		workType = None;
+		//printf("No work: %X \n", type);
 	}
 	
 }
