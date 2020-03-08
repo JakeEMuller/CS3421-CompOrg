@@ -26,10 +26,10 @@ void Clock::tick(unsigned int numberOfTicks)
 			imemory->doTick();
 			memory->doTick();
 			workToDo = isMoreCycleWorkNeeded();
-			printf("work \n");
+			//printf("work \n");
 		}
 		currentTick++;
-		printf("clock cycle: %d \n", currentTick);
+		//printf("clock cycle: %d \n", currentTick);
 	}
 }
 

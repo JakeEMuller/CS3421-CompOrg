@@ -1,5 +1,7 @@
 #pragma once
 #include <iostream>
+#include <stdlib.h>
+#include <stdio.h>
 #include "Memory.h"
 #include "InstructMem.h"
 using namespace std;

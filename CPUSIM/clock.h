@@ -1,5 +1,7 @@
 #pragma once
 #include <iostream>
+#include <stdlib.h>
+#include <stdio.h>
 #include "Cpu.h"
 #include "Memory.h"
 using namespace std;
@@ -15,7 +17,7 @@ public:
 	void dump();
 
 private:
-	unsigned short currentTick = 0;
+	unsigned short currentTick;
 	InstructMem* imemory;
 	Memory* memory;
 	Cpu* cpu;

@@ -8,13 +8,11 @@ imemory dump 0x0 0x10
 cpu reset
 memory dump 0x0 0x10
 clock tick 3
-cpu dump
 clock tick 23
-cpu dump
 clock tick 1
-cpu dump
 clock tick 1
-cpu dump
+clock tick 5
+clock tick 5
 clock tick 5
 cpu dump
 memory dump 0x0 0x10

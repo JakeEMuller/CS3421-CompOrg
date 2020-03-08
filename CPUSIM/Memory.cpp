@@ -52,6 +52,7 @@ void Memory::set(unsigned int hexAddress, unsigned int hexCount, unsigned char* 
 
 void Memory::setup(){
     speedCount = 0;
+    memSpeed = 5;
     workType = None;
 }
 
@@ -105,11 +106,10 @@ void Memory::completeMemFetch(){
 void Memory::startMemStore(unsigned int address, unsigned char StoredByte, bool* cpuWaiting){
     
     workType = setMem;
-    printf("startMemStore, Address: %X, StoredByte: %X, cpuWaiting: %X  \n", address, StoredByte, cpuWaiting);
-    cpuPCvalue = address; //at 
-    printf("here, cpuByteReturn: %X \n", cpuByteReturn);
+    //printf("startMemStore, Address: %X, StoredByte: %X, cpuWaiting: %X  \n", address, StoredByte, cpuWaiting);
+    cpuPCvalue = address; 
+    cpuByteReturn = (unsigned char*) malloc(sizeof(char) * 1); //find spot to temp store value
     *cpuByteReturn = StoredByte; //reuse memory fetch varables 
-    printf("no here \n");
     cpuWait = cpuWaiting;
     *cpuWaiting = true;
     
@@ -118,12 +118,12 @@ void Memory::startMemStore(unsigned int address, unsigned char StoredByte, bool*
 
 void Memory::completeMemStore(){
     if(speedCount < memSpeed - 1){ //make sure 
-        printf("wait on mem: %d", speedCount);
         speedCount++;
     } else {
-        printf("completeMemStore");
+        //printf("completeMemStore");
         memoryStored[cpuPCvalue] = *cpuByteReturn; 
         //printf("memory stored: %2X \n", *cpuByteReturn);
+        free(cpuByteReturn); //free address to avoid mem leak
         *cpuWait = false;
         workType = None;
         speedCount = 0;

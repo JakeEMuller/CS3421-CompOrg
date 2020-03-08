@@ -138,6 +138,7 @@ void Cpu::doTick(){
 		}
 	//halt 
 	}else if(workType == HALT){
+		//printf("Stay Halt \n");
 		workType = HALT;
 	}
 }
@@ -161,7 +162,6 @@ void Cpu::doInstruction(){
 		workType = storeInReg;
 
 	}else if(type == 6){ //store word
-		printf("store word \n");
 		unsigned int value = regs[source];
 		memory->startMemStore(regs[target], value, &waitingOnMem);
 		workType = finMemSw;
@@ -193,7 +193,7 @@ void Cpu::doInstruction(){
 		incPC();
 		workType = None;
 	}else if((type == 4) && ( (destination-1) == 0)){  //if s and t are equal inc PC if not set pc to imediate 
-		printf("beq, PC:%X \n" , regs[0]);
+		// printf("beq, PC:%X \n" , regs[0]);
 		if(regs[source] == regs[target]){
 			regs[0] = immediate;
 			cyclesNeeded = 1;
@@ -204,7 +204,7 @@ void Cpu::doInstruction(){
 		}
 
 	}else if(type == 4 && ((destination-1) == 1)){ // is s is less than t then PC = immediate otherwise increment and two cycles
-		printf("bneq \n");
+		// printf("bneq \n");
 		if(regs[source] != regs[target]){
 			regs[0] = immediate;
 			cyclesNeeded = 1;
@@ -225,6 +225,7 @@ void Cpu::doInstruction(){
 			workType = None;
 		}
 	}else if(type == 7){ //halt (inc PC then kill CPU)
+		//printf("Start HALT \n");
 		workType = HALT;
 		incPC();
 	}else {

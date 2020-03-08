@@ -1,5 +1,7 @@
 #pragma once
 #include <iostream>
+#include <stdlib.h>
+#include <stdio.h>
 
 using namespace std;
 
@@ -36,7 +38,7 @@ public:
 	void startMemStore(unsigned int address, unsigned char StoredByte, bool* cpuWaiting);
 	void completeMemStore();
 private:
-	unsigned int memSpeed = 5;
+	unsigned int memSpeed;
 	unsigned int speedCount;
 	bool* cpuWait;
 	unsigned char* cpuByteReturn;
