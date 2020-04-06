@@ -99,6 +99,13 @@ void Memory::completeMemFetch(){
     
 }
 
+char Memory::instaReturn(unsigned int address){
+    if(address >= memorySize){
+        printf("InstaReturn error");
+    }
+    return memoryStored[address];
+}
+
 //**************************
 // store memory methods
 //**************************
@@ -129,4 +136,12 @@ void Memory::completeMemStore(){
         speedCount = 0;
     }
     //printf("S memTime: %d \n", speedCount);
+}
+
+
+void Memory::instaStore(unsigned int address, unsigned char byte){
+    if(address >= memorySize){
+        printf("InstaStore Error");
+    }
+    memoryStored[address] = byte;
 }

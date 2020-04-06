@@ -29,6 +29,7 @@ void Clock::tick(unsigned int numberOfTicks)
 			//printf("work \n");
 		}
 		currentTick++;
+		cpu->ticks++;
 		//printf("clock cycle: %d \n", currentTick);
 	}
 }

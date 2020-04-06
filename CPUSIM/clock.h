@@ -8,7 +8,7 @@ using namespace std;
 
 class Clock {
 public:
-
+	unsigned short currentTick;
 	void reset();
 	void reset(Memory* mem, Cpu* cp, InstructMem* imem);
 	void tick(unsigned int numberOfTicks);
@@ -17,7 +17,7 @@ public:
 	void dump();
 
 private:
-	unsigned short currentTick;
+	
 	InstructMem* imemory;
 	Memory* memory;
 	Cpu* cpu;

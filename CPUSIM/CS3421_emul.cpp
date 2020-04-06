@@ -14,25 +14,27 @@ int main(int argc, char** argv) {
 
 	
 	if(argc <= 1){
-		unsigned char yeet = 0xFF;
-		unsigned char yoot = ~yeet;
-		printf("%X, %X \n", yeet, yoot);
-		return 0;
+		return 0; //for testing purposes 
 	}
 
 	//get the name of the file from the command line
 	char* fileName = argv[1];
 
-	//create the three devices
+	//create the devices
 	//memory
 	Memory memory; //memory should be initalized on memory create command
 	memory.setup();
 	//instruction memory 
 	InstructMem imemory;
 	imemory.setup();
+	
+	//Cache
+	Cache cache;
+	cache.setup(&memory);
+
 	//cpu
 	Cpu cpu;
-	cpu.reset(&memory, &imemory);
+	cpu.reset(&memory, &imemory, &cache);
 	
 	//clock
 	Clock clock;
@@ -144,6 +146,16 @@ int main(int argc, char** argv) {
 			char thing[100];
 			junk = fscanf(inputFile , "%100s", thing);
 			imemory.set(hexValue, thing);
+		} else 
+		//cashe instructions
+		if(!strcmp("cache reset", command)){
+			cache.reset();
+		}else if(!strcmp("cache on", command)){
+			cache.on();
+		}else if(!strcmp("cache off", command)){
+			cache.off();
+		}else if(!strcmp("cache dump", command)){
+			cache.dump();
 		}
 	}
 
@@ -153,4 +165,5 @@ int main(int argc, char** argv) {
 	memory.kill(); //frees any allocated memory
 	cpu.kill();
 	imemory.kill();
+	cache.kill();
 }

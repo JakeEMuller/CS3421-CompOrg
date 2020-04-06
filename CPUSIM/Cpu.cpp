@@ -3,6 +3,7 @@
 //resets all registers to 0x00
 void Cpu::reset()
 {
+	ticks = 0;
 	waitingOnMem = false;
 	free(regs);
 	regs = (unsigned char*) calloc(9, sizeof(unsigned char)); //set all registers to zero
@@ -10,11 +11,13 @@ void Cpu::reset()
 	workType = None;
 	memory->setup(); //reset memory in case memory is doing somthing for cpu
 }
-void Cpu::reset(Memory* m, InstructMem* i){
+void Cpu::reset(Memory* m, InstructMem* i, Cache* c){
+	ticks = 0;
 	waitingOnMem = false;
 	receivedByte = 0x00;
 	cyclesNeeded = 0;
 	regs = (unsigned char*) calloc(9, sizeof(unsigned char));
+	cache = c;
 	memory = m;
 	imemory = i;
 	workType = None;
@@ -72,7 +75,8 @@ void Cpu::dump()
 	printf("RE: 0x%02X \n", regs[5]);
 	printf("RF: 0x%02X \n", regs[6]);
 	printf("RG: 0x%02X \n", regs[7]);
-	printf("RH: 0x%02X \n\n", regs[8]);
+	printf("RH: 0x%02X \n", regs[8]);
+	printf("TC:   %d\n\n", ticks);
 }
 //******************************************
 //  Tick work
@@ -128,13 +132,20 @@ void Cpu::doTick(){
 	else if(workType == finMemSw && !waitingOnMem){
 		workType = None; //finish instruction so new instruction is started yet  
 		incPC();
-	//wait on cpu
-	} else if(workType == WaitOnCPU){
+	//wait on cpu / caches (when tick missed)
+	} else if(workType == WaitOnCPU || workType == WaitOnflush || workType == WaitOnLoad){
 		cyclesNeeded--;
 		if(cyclesNeeded <= 0){
+			if(workType == WaitOnflush){
+				cache->flush(); //flush cache
+				incPC();
+			}
+			if(workType == WaitOnLoad){
+				printf("reg %d", receivedByte);
+				regs[receivedByte] = cache->load();
+				incPC();
+			}
 			workType = None;
-		}else {
-			workType = WaitOnCPU;
 		}
 	//halt 
 	}else if(workType == HALT){
@@ -156,15 +167,67 @@ void Cpu::doInstruction(){
 	//printf("type: %d \n", type);
 	//set Worktype
 	if(type == 5){ //load word
-		unsigned int add = (instruction >> 8) & 0x7; //find memory address to get
+		if(cache->state == true){
+			char result = 0;
+			if((regs[target] / 8) == cache->CLO){ //cache hit and valid data is availible 
+				if(cache->validData || cache->isWritten(regs[target] % 8)){
+					result = cache->read(regs[target] % 8);
+					regs[destination] = result;
+					incPC();
+					workType = None;
+				}else { //cache is invalid and not written
+					cyclesNeeded = memory->memSpeed -1;
+					cache->address = regs[target];
+					receivedByte = destination; //use unused memory to store register value temparaily 
+					workType = WaitOnLoad;
+				}
+				
+			}else{ //cache miss
+				cyclesNeeded = memory->memSpeed -1;
+				cache->address = regs[target];
+				receivedByte = destination; //use unused memory to store register value temparaily 
+				workType = WaitOnLoad;
+			}
+		}else{
+		//find memory address to get
 		//printf("lw address: %d \n", add);
-		memory->startMemFetch(regs[add+1], &receivedByte, &waitingOnMem);
+		memory->startMemFetch(regs[target], &receivedByte, &waitingOnMem);
 		workType = storeInReg;
 
+		}
+		
 	}else if(type == 6){ //store word
 		unsigned int value = regs[source];
-		memory->startMemStore(regs[target], value, &waitingOnMem);
-		workType = finMemSw;
+		if(cache->state == true){
+			char location = regs[target] % 8;
+			if((regs[target] / 8) == cache->CLO){ //cache hit
+				cache->write(location, value);
+				incPC();
+				workType = None;
+				//store in cache
+
+			}else if((regs[target] / 8) != cache->CLO && cache->hasWritten() ){ //cache miss and does need to be flushed
+				//will take multiple cycles
+				cyclesNeeded = memory->memSpeed -1; 
+				cache->validData = false;
+				cache->cpudata = value;
+				cache->address = regs[target];
+				workType = WaitOnflush;
+			}else {
+				cache->validData = false; //invalidate data
+				cache->CLO = regs[target] / 8;	//change CLO
+				cache->write(location, value);	
+				incPC();
+				workType = None;
+
+			}
+		}else{ //if cache is off do regular work
+			
+			memory->startMemStore(regs[target], value, &waitingOnMem);
+			workType = finMemSw;
+		}
+		
+		
 	} else if(type == 0){ //add two complement numbers
 		// add registers 
 		char s = regs[source];

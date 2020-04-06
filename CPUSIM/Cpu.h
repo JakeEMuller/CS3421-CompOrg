@@ -4,11 +4,13 @@
 #include <stdio.h>
 #include "Memory.h"
 #include "InstructMem.h"
+#include "Cache.h"
 using namespace std;
 
 class Cpu {
 public:
-	enum workType {None, findInstruct, readInstruct, doInstruct, storeInReg, finMemSw, WaitOnCPU, HALT};
+	int ticks;
+	enum workType {None, findInstruct, readInstruct, doInstruct, storeInReg, finMemSw, WaitOnCPU, WaitOnflush, WaitOnLoad, HALT};
 	//start new tick
 	void startTick();
 	//do tick work
@@ -22,7 +24,7 @@ public:
 	//resets all registers to 0x00
 	void reset();
 	//reset but sets memory
-	void reset(Memory* m, InstructMem* i);
+	void reset(Memory* m, InstructMem* i, Cache* c);
 	//kill register mem
 	void kill();
 	//set a register with a hex byte
@@ -40,6 +42,7 @@ private:
 	//Declare Registers
 	Memory* memory;
 	InstructMem* imemory;
+	Cache* cache;
 	int workType;
 	//return varables
 	bool waitingOnMem;

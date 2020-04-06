@@ -7,6 +7,7 @@ using namespace std;
 
 class Memory {
 public:
+	unsigned int memSpeed;
 	unsigned int memorySize; // in hex
 	int workType;
 	//basic setup
@@ -33,12 +34,15 @@ public:
 	//load memory function
 	void startMemFetch(unsigned int address, unsigned char* cpuByte, bool* cpuWaiting);
 	void completeMemFetch();
+	char instaReturn(unsigned int address);
 
 	//store memory function
 	void startMemStore(unsigned int address, unsigned char StoredByte, bool* cpuWaiting);
 	void completeMemStore();
+	void instaStore(unsigned int address, unsigned char byte);
+	
 private:
-	unsigned int memSpeed;
+	
 	unsigned int speedCount;
 	bool* cpuWait;
 	unsigned char* cpuByteReturn;
