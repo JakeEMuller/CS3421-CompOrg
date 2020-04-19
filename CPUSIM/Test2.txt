@@ -4,13 +4,18 @@ memory reset
 memory set 0x0 0x8 0x1 0x2 0x3 0x4 0x5 0x6 0x7 0x8
 imemory create 0x100
 imemory reset
-imemory set 0x0 file Sample4_instructions.txt
+imemory set 0x0 file Sample5_Instructions.txt
 cpu reset
 cache reset
 cache on
+iodev reset
+iodev load Sample5_IODev.txt
+memory dump 0x0 0x8
+clock tick 14
+cpu dump
+memory dump 0x0 0x8
 cache dump
-clock tick 5
+clock tick 10
+cpu dump
+memory dump 0x0 0x8
 cache dump
-clock tick 8
-cache dump
-clock tick 100

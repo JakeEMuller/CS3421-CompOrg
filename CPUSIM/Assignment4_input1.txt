@@ -20,7 +20,6 @@ memory dump 0x0 0x9
 cache reset
 cache on
 clock tick 12
-cache dump
 cpu dump
 clock tick 19
 memory dump 0x0 0x9

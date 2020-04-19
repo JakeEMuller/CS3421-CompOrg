@@ -24,6 +24,11 @@ int main(int argc, char** argv) {
 	//memory
 	Memory memory; //memory should be initalized on memory create command
 	memory.setup();
+
+	//IO setup
+	InOut IO;
+	IO.setup(&memory);
+
 	//instruction memory 
 	InstructMem imemory;
 	imemory.setup();
@@ -38,7 +43,7 @@ int main(int argc, char** argv) {
 	
 	//clock
 	Clock clock;
-	clock.reset(&memory, &cpu, &imemory);
+	clock.reset(&memory, &cpu, &imemory, &IO);
 	
 
 
@@ -156,6 +161,15 @@ int main(int argc, char** argv) {
 			cache.off();
 		}else if(!strcmp("cache dump", command)){
 			cache.dump();
+		}
+
+		//IO instructions
+		else if(!strcmp("iodev reset", command)){
+			IO.Reset();
+		}else if(!strcmp("iodev load", command)){
+			char IOfile[255] = "null"; //would be surprised if it exceded 255 (aka file lenght of windows)
+			junk = fscanf(inputFile ,"%s", IOfile);
+			IO.Load(IOfile);
 		}
 	}
 

@@ -134,19 +134,21 @@ void Cpu::doTick(){
 		incPC();
 	//wait on cpu / caches (when tick missed)
 	} else if(workType == WaitOnCPU || workType == WaitOnflush || workType == WaitOnLoad){
-		cyclesNeeded--;
-		if(cyclesNeeded <= 0){
-			if(workType == WaitOnflush){
-				cache->flush(); //flush cache
-				incPC();
+		if(memory->BeingUsed == false){ //if memory is being used wait
+			cyclesNeeded--;
+			if(cyclesNeeded <= 0){
+				if(workType == WaitOnflush){
+					cache->flush(); //flush cache
+					incPC();
+				}
+				if(workType == WaitOnLoad){
+					regs[receivedByte] = cache->load();
+					incPC();
+				}
+				workType = None;
 			}
-			if(workType == WaitOnLoad){
-				printf("reg %d", receivedByte);
-				regs[receivedByte] = cache->load();
-				incPC();
-			}
-			workType = None;
 		}
+		
 	//halt 
 	}else if(workType == HALT){
 		//printf("Stay Halt \n");
@@ -169,13 +171,19 @@ void Cpu::doInstruction(){
 	if(type == 5){ //load word
 		if(cache->state == true){
 			char result = 0;
-			if((regs[target] / 8) == cache->CLO){ //cache hit and valid data is availible 
+			if(regs[target] == 0xFF){
+				cache->cpudata = 0xFF;
+				cache->flush();
+				workType = None;
+				incPC();
+			}else if((regs[target] / 8) == cache->CLO){ //cache hit and valid data is availible 
 				if(cache->validData || cache->isWritten(regs[target] % 8)){
 					result = cache->read(regs[target] % 8);
 					regs[destination] = result;
 					incPC();
 					workType = None;
 				}else { //cache is invalid and not written
+					
 					cyclesNeeded = memory->memSpeed -1;
 					cache->address = regs[target];
 					receivedByte = destination; //use unused memory to store register value temparaily 
@@ -183,6 +191,7 @@ void Cpu::doInstruction(){
 				}
 				
 			}else{ //cache miss
+				
 				cyclesNeeded = memory->memSpeed -1;
 				cache->address = regs[target];
 				receivedByte = destination; //use unused memory to store register value temparaily 

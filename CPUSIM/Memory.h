@@ -10,6 +10,7 @@ public:
 	unsigned int memSpeed;
 	unsigned int memorySize; // in hex
 	int workType;
+	bool BeingUsed;
 	//basic setup
 	void setup();
 	//work types for Memory

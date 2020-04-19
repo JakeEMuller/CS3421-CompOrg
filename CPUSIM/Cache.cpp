@@ -55,16 +55,27 @@ void Cache::off(){
 //************************************
 // Tick Work
 //************************************
-
+//This should be simplifyed But im lazy (ONE FOR LOOP WITH IF STATEMENT DECLARING "ADDRESS" FOR INSTASTORE)
 void Cache::flush(){
-    for(int i = 0; i < 8; i++){
-        if(dataWriten[i] == true){
-            memory->instaStore(address, storedMem[i]);
-        }
-    }
+    
     if(cpudata != 0xFF){ //when just flushing this action is not needed
+        for(int i = 0; i < 8; i++){
+            if(dataWriten[i] == true){
+                memory->instaStore(address, storedMem[i]);
+                dataWriten[i] = false;
+            }
+        }
         CLO = address / 8;
         storedMem[address % 8] = cpudata;
+    } else {
+        for(int i = 0; i < 8; i++){
+            if(dataWriten[i] == true){
+                memory->instaStore((CLO*8)+i, storedMem[i]); 
+                dataWriten[i] = false;
+            }
+        }
+        
+        validData = false;
     }
 
 }

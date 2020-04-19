@@ -7,6 +7,7 @@ void Memory::create(unsigned int hexSize)
     //printf("Mem size is: %09d\n", memorySize);
     //printf("hexSize * sizeof(unsigned char) = %d\n", hexSize * sizeof(unsigned char));
     memoryStored = (unsigned char*) malloc(hexSize * sizeof(unsigned char)); 
+    BeingUsed = false;
 }
 //sets all memory to 0x00
 void Memory::reset()
@@ -76,6 +77,7 @@ bool Memory::isMoreWorkNeeded(){
 // Load memory methods
 //*******************************
 void Memory::startMemFetch(unsigned int address, unsigned char* cpuByte, bool* cpuWaiting){
+    BeingUsed = true;
     workType = MemFetch;
     cpuPCvalue = address; //save PC value
     cpuByteReturn = cpuByte; //save location where byte will be stored
@@ -94,7 +96,9 @@ void Memory::completeMemFetch(){
         workType = None;
         //printf("completeMemFetch, Byte Return: %X \n", *cpuByteReturn);
         speedCount = 0;
+        BeingUsed = false;
     }
+    
     //printf("L memTime: %d \n", speedCount);
     
 }
@@ -111,7 +115,7 @@ char Memory::instaReturn(unsigned int address){
 //**************************
 
 void Memory::startMemStore(unsigned int address, unsigned char StoredByte, bool* cpuWaiting){
-    
+    BeingUsed = true;
     workType = setMem;
     //printf("startMemStore, Address: %X, StoredByte: %X, cpuWaiting: %X  \n", address, StoredByte, cpuWaiting);
     cpuPCvalue = address; 
@@ -134,6 +138,7 @@ void Memory::completeMemStore(){
         *cpuWait = false;
         workType = None;
         speedCount = 0;
+        BeingUsed = false;
     }
     //printf("S memTime: %d \n", speedCount);
 }
@@ -143,5 +148,6 @@ void Memory::instaStore(unsigned int address, unsigned char byte){
     if(address >= memorySize){
         printf("InstaStore Error");
     }
+    //printf("Address: %02X  Byte: %02X \n", address, byte);
     memoryStored[address] = byte;
 }
