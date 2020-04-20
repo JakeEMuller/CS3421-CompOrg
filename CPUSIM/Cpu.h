@@ -31,7 +31,7 @@ public:
     void setReg(char secondRegisterLetter , unsigned char hexByte);
 	//dumps all values of registers too the console
 	void dump();
-
+	void inTicks();
 	//do instruction 
 	void doInstruction();
 

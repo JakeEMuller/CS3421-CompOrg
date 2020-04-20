@@ -6,6 +6,7 @@ void Cache::setup(Memory* m){
     state = false; // 0 = OFF 1 = ON
     storedMem = (unsigned char*) malloc(sizeof(unsigned char) * 8 );
     CLO = 0;
+    previousWrite = (bool*) calloc(8, sizeof(bool));
     dataWriten = (bool*) calloc(8, sizeof(bool)); 
     validData = false;
     
@@ -21,8 +22,10 @@ void Cache::reset(){
 void Cache::kill(){
     free(storedMem);
     free(dataWriten);
+    free(previousWrite);
     storedMem = NULL;
     dataWriten = NULL;
+    previousWrite = NULL;
 }
 
 void Cache::dump(){
@@ -32,13 +35,15 @@ void Cache::dump(){
     for(int i = 0; i < 8; i++){
         if(dataWriten[i] == 1){
             printf("W    ");
+        }else if(previousWrite[i] == 1 && storedMem[i] == memory->instaReturn((CLO*8)+i)){
+            printf("V    ");
         }else if(validData){
             printf("V    ");
         }else if(!validData){
             printf("I    ");
         }
     }
-    printf("\n");
+    printf("\n\n");
 
 }
 
@@ -59,19 +64,32 @@ void Cache::off(){
 void Cache::flush(){
     
     if(cpudata != 0xFF){ //when just flushing this action is not needed
+        //printf("getting here: %X \n", CLO);
         for(int i = 0; i < 8; i++){
             if(dataWriten[i] == true){
-                memory->instaStore(address, storedMem[i]);
+                //printf("Writen Data %X, addy %X \n", storedMem[i], CLO*8+i);
+                memory->instaStore((CLO*8)+i, storedMem[i]);
                 dataWriten[i] = false;
+                previousWrite[i] = true;
+            }else{
+                previousWrite[i] = false;
             }
         }
-        CLO = address / 8;
+        if(address == 0xFF){
+            CLO = 0;
+        }else{
+            CLO = address / 8;
+        }
         storedMem[address % 8] = cpudata;
     } else {
+        //printf("getting here not FF\n");
         for(int i = 0; i < 8; i++){
             if(dataWriten[i] == true){
                 memory->instaStore((CLO*8)+i, storedMem[i]); 
                 dataWriten[i] = false;
+                previousWrite[i] = true;
+            }else{
+                previousWrite[i] = false;
             }
         }
         

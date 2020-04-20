@@ -307,3 +307,9 @@ void Cpu::doInstruction(){
 	
 }
 
+void Cpu::inTicks(){
+	if(workType != HALT){
+		ticks++;
+	}
+}
+

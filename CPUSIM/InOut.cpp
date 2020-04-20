@@ -22,7 +22,7 @@
  }
 
  void InOut::Dump(){
-     printf("IO Device: 0x%02X \n", IOReg);
+     printf("IO Device: 0x%02X \n\n", IOReg);
  }
  
  void InOut::StartTick(){

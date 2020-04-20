@@ -33,8 +33,8 @@ bool isWritten(char location);
 private:
 int workType;
 Memory* memory;
-unsigned char* storedMem;
-
+unsigned char* storedMem; 
+bool* previousWrite;
 bool* dataWriten; //0 = nothing 1 = written
 
 

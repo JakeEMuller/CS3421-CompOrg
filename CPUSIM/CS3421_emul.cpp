@@ -170,7 +170,10 @@ int main(int argc, char** argv) {
 			char IOfile[255] = "null"; //would be surprised if it exceded 255 (aka file lenght of windows)
 			junk = fscanf(inputFile ,"%s", IOfile);
 			IO.Load(IOfile);
+		}else if(!strcmp("iodev dump", command)){
+			IO.Dump();
 		}
+
 	}
 
 	if(junk == EOF){

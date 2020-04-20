@@ -19,6 +19,8 @@ void Clock::reset(Memory* mem, Cpu* cp, InstructMem* imem, InOut* I){
 void Clock::tick(unsigned int numberOfTicks)
 {
 	for(unsigned int i = 0; i < numberOfTicks; i++){
+		currentTick++;
+		cpu->inTicks();
 		startTick();
 		bool workToDo = true;
 		while(workToDo){
@@ -28,8 +30,7 @@ void Clock::tick(unsigned int numberOfTicks)
 			memory->doTick();
 			workToDo = isMoreCycleWorkNeeded();
 		}
-		currentTick++;
-		cpu->ticks++;
+		
 		//printf("clock cycle: %d \n", currentTick);
 	}
 }
